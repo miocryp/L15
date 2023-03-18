@@ -1,4 +1,6 @@
 import { Component } from '@angular/core';
+import { ethers } from 'ethers';
+
 
 @Component({
   selector: 'app-root',
@@ -6,5 +8,12 @@ import { Component } from '@angular/core';
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent {
-  title = 'app';
+  blockNumber: number | string | undefined;
+  constructor() {
+    this.blockNumber = "loading...";
+    const provider = ethers.getDefaultProvider('goerli');
+    provider.getBlock('latest').then((block) => {
+      this.blockNumber = block.number;
+    })
+  }
 }
