@@ -34,5 +34,4 @@ export class AppComponent {
 function clearBlock() {
   throw new Error('Function not implemented.');
 }
-
 */
