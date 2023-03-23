@@ -1,6 +1,8 @@
+import { HttpClient } from '@angular/common/http';
 import { Component } from '@angular/core';
-import { ethers } from 'ethers';
+import { Wallet, ethers, utils } from 'ethers';
 
+const API_URL = "http://localhost:3000/contract-address";
 
 @Component({
   selector: 'app-root',
@@ -10,28 +12,39 @@ import { ethers } from 'ethers';
 export class AppComponent {
   blockNumber: number | string| undefined;
   provider: ethers.providers.BaseProvider;
-  transactions: string[] | undefined;
+  userWallet: Wallet | undefined;
+  userEthBalance: number | undefined;
+  userTokenBalance: number | undefined;
+  tokenContractAddress: string | undefined;
 
-  constructor() {
+  constructor( private http: HttpClient) {
     this.provider = ethers.getDefaultProvider('goerli');
-    //setInterval(() => {this.blockNumber++}, 1000)
     }
+
+  getTokenAddress() {
+    return this.http.get<{address: string}>(API_URL);
+  }
 
 
   syncBlock() {
-    //this.blockNumber = "loading...";
     this.provider.getBlock('latest').then((block) => {
     this.blockNumber = block.number;
-    this.transactions = block.transactions;
+  });
+  this.getTokenAddress().subscribe((response) => {
+    this.tokenContractAddress = response.address;
   })
+
 }
 
   clearBlock() {
     this.blockNumber = 0;
   }
+
+  createWallet() {
+    this.userWallet = Wallet.createRandom().connect(this.provider);
+    this.userWallet.getBalance().then((balanceBN) => {
+      const balanceStr = utils.formatEther(balanceBN);
+      this.userEthBalance = parseFloat(balanceStr);
+    });
+  }
 }
-/*
-function clearBlock() {
-  throw new Error('Function not implemented.');
-}
-*/
