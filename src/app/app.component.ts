@@ -1,6 +1,8 @@
 import { HttpClient } from '@angular/common/http';
 import { Component } from '@angular/core';
-import { Wallet, ethers, utils } from 'ethers';
+import { BigNumber, Contract, Wallet, ethers, utils } from 'ethers';
+import tokenJson from '../assets/MyToken.json';
+
 
 const API_URL = "http://localhost:3000/contract-address";
 
@@ -16,6 +18,8 @@ export class AppComponent {
   userEthBalance: number | undefined;
   userTokenBalance: number | undefined;
   tokenContractAddress: string | undefined;
+  tokenContract: Contract | undefined;
+  tokenTotalSupply: number | string | undefined;
 
   constructor( private http: HttpClient) {
     this.provider = ethers.getDefaultProvider('goerli');
@@ -32,12 +36,31 @@ export class AppComponent {
   });
   this.getTokenAddress().subscribe((response) => {
     this.tokenContractAddress = response.address;
+    this.updateTokenInfo();
   })
-
 }
 
+  updateTokenInfo() {
+    if (!this.tokenContractAddress) return;
+    //this.blockNumber = new Contract(this.tokenContractAdress, abi, this.userWallet ?? this.provider);
+    this.tokenContract = new Contract(
+      this.tokenContractAddress,
+      tokenJson.abi,
+      this.userWallet ?? this.provider
+    );
+    this.tokenTotalSupply = 'Loading...';
+    this.tokenContract['totalSupply']().then((totalSupplyBN: BigNumber) => {
+        const totalSupplyStr = utils.formatEther(totalSupplyBN);
+        this.tokenTotalSupply = parseFloat(totalSupplyStr);
+      })
+    }
+
   clearBlock() {
-    this.blockNumber = 0;
+      this.blockNumber = 0;
+  }
+
+  requestTokens() {
+    console.log("TODO: request token from the backend passing the address");
   }
 
   createWallet() {
