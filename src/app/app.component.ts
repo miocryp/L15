@@ -5,6 +5,7 @@ import tokenJson from '../assets/MyToken.json';
 
 
 const API_URL = "http://localhost:3000/contract-address";
+const API_URL_MINT = "http://localhost:3000/request-tokens";
 
 @Component({
   selector: 'app-root',
@@ -59,15 +60,21 @@ export class AppComponent {
       this.blockNumber = 0;
   }
 
-  requestTokens() {
-    console.log("TODO: request token from the backend passing the address");
-  }
-
   createWallet() {
     this.userWallet = Wallet.createRandom().connect(this.provider);
     this.userWallet.getBalance().then((balanceBN) => {
       const balanceStr = utils.formatEther(balanceBN);
       this.userEthBalance = parseFloat(balanceStr);
     });
+  }
+
+  requestTokens(amount: string) {
+    //console.log("TODO: request token from the backend passing the address");
+    const body = {address: this.userWallet?.address, amount: amount};
+   this.http.post<{result: string}>(API_URL_MINT, body).subscribe((result) => {
+    console.log('Request' + amount + 'tokens for address ' + this.userWallet?.address
+    );
+    console.log('Transaction hash:' + result.result);
+  })
   }
 }

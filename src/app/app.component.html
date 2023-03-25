@@ -17,15 +17,17 @@
           <h6 class="card-subtitle mb-2 text-muted">
             {{userWallet.address}}
           </h6>
-          <p class="card-text">
-            Balance: {{userEthBalance}} ETH
-          </p>
-          <button type="button" class="btn btn-danger btn-lg px-4 gap-3 my-4"
-          (click) = "requestTokens()"
-          >
+          <p class="card-text"> Balance: {{userEthBalance}} ETH </p>
+          <p class="card-text"> Balance: {{userTokenBalance}} ZETA </p>
+
+          <button
+          *ngIf  = "+mintAmount.value > 0"
+          type="button" class="btn btn-danger btn-lg px-4 gap-3 my-4"
+          (click) = "requestTokens(mintAmount.value)">
           Request Tokens
           </button>
-
+          <p> Amount </p>
+          <input #mintAmount type="number" min="0" max="10" class="input">
         </div>
       </div>
       <div class="card mt-4 mx-auto" *ngIf="tokenContractAddress">
